@@ -12,7 +12,7 @@ const info = async () => {
 
 const deployProposal = async (roleNFTAddr) => {
   
-  const Proposal = await hre.ethers.getContractFactory("DAO");
+  const Proposal = await hre.ethers.getContractFactory("Pet2DAOProposal");
   const proposal = await Proposal.deploy(roleNFTAddr);
   await proposal.deployed();
   console.log("Proposal Contract deployed to:", proposal.address);
@@ -22,15 +22,16 @@ const deployProposal = async (roleNFTAddr) => {
 }
 
 const deployRoleNFT = async (name, symbol) => {
-  const RoleNFT = await hre.ethers.getContractFactory("RoleNFT");
-  const roleNFT = await RoleNFT.deploy(name, symbol);
-  await roleNFT.deployed();
-  console.log("RoleNFT Contract deployed to:", roleNFT.address);
+  // const EmployeeNFT = await hre.ethers.getContractFactory("EmployeeNFT");
+  // const roleNFT = await EmployeeNFT.deploy(name, symbol);
+  // await roleNFT.deployed();
+  // console.log("EmployeeNFT Contract deployed to:", roleNFT.address);
 
-  await verify(roleNFT.address, [name, symbol]);
-  // await verify('0xD052FbCc42BDA276D55EF7C45eeB0b56872B7f93', [name, symbol]);
+  // await verify(roleNFT.address, [name, symbol]);
+  await verify('0x09a24448fEC175227F2292fbe953b52CbD118041', [name, symbol]);
 
-  return roleNFT.address;
+  // return roleNFT.address;
+  return '0x09a24448fEC175227F2292fbe953b52CbD118041'
 }
 
 async function main() {

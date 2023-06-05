@@ -3,71 +3,101 @@ pragma solidity ^0.8.11;
 
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "./IRoleNFT.sol";
-import "./StructDeclaration.sol";
+import "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
+import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
+import "./IEmployeeNFT.sol";
 
-contract DAO is Ownable {
+contract Pet2DAOProposal is Ownable, ERC721URIStorage, EIP712 {
+    string private constant SIGNING_DOMAIN = "Level-Voucher";
+    string private constant SIGNATURE_VERSION = "1";
+
     struct Proposal {
         address creator;
         string contentURL;
-        uint level;
-        bool isRejected;
+        uint32[] approvers;
+        bool isAccepted;
         bool isPublic;
     }
 
-    IRoleNFT public roleNFT;
-    Proposal[] private _proposals;
-
-    mapping(uint256 => bytes32[]) private permissionOfApprove;
-
-    constructor(address _roleNFT) {
-        roleNFT = IRoleNFT(_roleNFT);
+    struct LevelVoucher {
+        uint32 nftId;
+        uint256 proposalId;
+        uint256 level;
+        bool isAccepted;
+        bytes signature;
     }
 
+    IEmployeeNFT public employeeNFT;
+    Proposal[] private _proposals;
+    uint256[] private _approvedProposalIds;
+
+    constructor(address _employeeNFT)
+        ERC721("Employee NFT", "Employee") EIP712(SIGNING_DOMAIN, SIGNATURE_VERSION) {
+            employeeNFT = IEmployeeNFT(_employeeNFT);
+        }
+
     modifier onlyAdmin() {
-        require(roleNFT.isAdmin(msg.sender), "Restricted to members.");
+        require(employeeNFT.isAdmin(msg.sender), "Restricted to admins.");
         _;
     }
 
-    function createProposal(string memory _contentURI, bool _isPublic) public {
-        _proposals.push(Proposal(msg.sender, _contentURI, 0, false, _isPublic));
+    function _beforeTokenTransfer(address from, address to, uint256 tokenId, uint256 batchSize)
+        internal
+        override(ERC721)
+    {
+        super._beforeTokenTransfer(from, to, tokenId, batchSize);
     }
 
-    function approveProposal(uint256 index) external {
+    function _transfer(
+        address from,
+        address to,
+        uint256 tokenId
+    ) internal override {
+        require(from == address(0), "You can't transfer this NFT.");
+        super._transfer(from, to, tokenId);
+    }
+
+    function _mint(
+        uint256 _tokenId,
+        address to,
+        string memory _tokenURI
+    ) internal {
+        _safeMint(to, _tokenId);
+        _setTokenURI(_tokenId, _tokenURI);
+    }
+
+    function tokenURI(
+        uint256 tokenId
+    ) public view override(ERC721URIStorage) returns (string memory) {
+        return super.tokenURI(tokenId);
+    }
+
+    function createProposal(string memory _contentURI, uint32[] calldata _approvers, bool _isPublic) public {
+        _proposals.push(Proposal(msg.sender, _contentURI, _approvers, false, _isPublic));
+    }
+
+    function approveProposal(uint256 index, LevelVoucher[] calldata vouchers, bool nftRequired) external {
         require(
-            _proposals[index].isRejected == false,
-            "This proposal is rejected"
+            _proposals[index].isAccepted == false,
+            "This proposal is already accepted"
         );
-
-        Proposal storage _proposal = _proposals[index];
-        Identity memory _identity = roleNFT.getIdentity(msg.sender);
-        bytes32 _permission = keccak256(
-            abi.encodePacked(_identity.department, "_", _identity.role)
-        );
-
-        for (uint i = 0; i < permissionOfApprove[_proposal.level].length; i++) {
-            if (_permission == permissionOfApprove[_proposal.level][i]) {
-                _proposal.level += 1;
-                return;
+        Proposal memory _proposal = _proposals[index];
+        uint32[] memory _approvers = _proposal.approvers;
+        for(uint256 i = 0; i < _approvers.length - 1; i++) {
+            address signer = _verify(vouchers[i]);
+            if (signer != employeeNFT.ownerOf(uint256(vouchers[i].nftId)) || vouchers[i].nftId != _approvers[i]) revert("Invalid Voucher Address");
+            if (index != vouchers[i].proposalId) revert("Invalid Proposal Id");
+            if (i != vouchers[i].level) revert("Invalid Level");
+            if (i != _approvers.length - 1) {
+                if (!vouchers[i].isAccepted) revert("Proposal is already rejected");
+            } else {
+                _proposal.isAccepted = true;
+                _approvedProposalIds.push(index);
+                if (nftRequired) _mint(index, msg.sender, _proposal.contentURL);
             }
         }
-        revert("No permission");
-    }
-
-    function rejectProposal(uint256 index) external {
-        Proposal storage _proposal = _proposals[index];
-        Identity memory _identity = roleNFT.getIdentity(msg.sender);
-        bytes32 _permission = keccak256(
-            abi.encodePacked(_identity.department, "_", _identity.role)
-        );
-
-        for (uint i = 0; i < permissionOfApprove[_proposal.level].length; i++) {
-            if (_permission == permissionOfApprove[_proposal.level][i]) {
-                _proposal.isRejected = true;
-                return;
-            }
-        }
-        revert("No permission");
     }
 
     function deleteProposal(uint index) public onlyAdmin {
@@ -88,31 +118,48 @@ contract DAO is Ownable {
         return proposalSlice;
     }
 
+    function getApprovedProposals(
+        uint256 start,
+        uint256 end
+    ) public view returns (Proposal[] memory) {
+        require(end <= _approvedProposalIds.length, "Invalid Index");
+        Proposal[] memory proposalSlice = new Proposal[](end - start);
+        for (uint256 i = start; i < end; i++) {
+            proposalSlice[i] = _proposals[_approvedProposalIds[i]];
+        }
+        return proposalSlice;
+    }
+
     function getProposalCount() external view returns (uint256) {
         return _proposals.length;
     }
 
-    function addPermission(
-        uint256 _level,
-        string memory _role
-    ) public onlyAdmin {
-        permissionOfApprove[_level].push(keccak256(abi.encodePacked(_role)));
+    function getApprovedProposalCount() external view returns (uint256) {
+        return _approvedProposalIds.length;
     }
 
-    function deletePermission(uint256 _level, uint index) public onlyAdmin {
-        bytes32[] storage _permission = permissionOfApprove[_level];
-        require(index < _permission.length, "Invalid Index");
-        _permission[index] = _permission[_permission.length - 1];
-        _permission.pop();
+    function setEmployeeNFT(address _employeeNFT) external onlyAdmin {
+        employeeNFT = IEmployeeNFT(_employeeNFT);
     }
 
-    function setRoleNFT(address _roleNFT) external onlyAdmin {
-        roleNFT = IRoleNFT(_roleNFT);
+    function supportsInterface(
+        bytes4 interfaceId
+    ) public view override(ERC721) returns (bool) {
+        return super.supportsInterface(interfaceId);
     }
 
-    function getPermissionsOfLevel(
-        uint256 _level
-    ) public view returns (bytes32[] memory) {
-        return permissionOfApprove[_level];
+    function _hash(LevelVoucher calldata voucher) internal view returns (bytes32) {
+        return _hashTypedDataV4(keccak256(abi.encode(
+            keccak256("LevelVoucher(uint32 nftId,uint256 proposalId,uint256 level,bool isAccepted)"),
+            voucher.nftId,
+            voucher.proposalId,
+            voucher.level,
+            voucher.isAccepted
+        )));
+    }
+
+    function _verify(LevelVoucher calldata voucher) internal view returns (address) {
+        bytes32 digest = _hash(voucher);
+        return ECDSA.recover(digest, voucher.signature);
     }
 }

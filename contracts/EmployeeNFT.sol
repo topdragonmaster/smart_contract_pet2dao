@@ -2,32 +2,24 @@
 pragma solidity ^0.8.11;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
-import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
-import "./StructDeclaration.sol";
 
-contract RoleNFT is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable, AccessControlEnumerable {
-    using Counters for Counters.Counter;
-    Counters.Counter private _tokenIds;
-
-    mapping(uint256 => Identity) public idOfIdentity;
-    mapping(address => uint256) public tokenIdOf;
+contract EmployeeNFT is ERC721, ERC721URIStorage, Ownable, AccessControlEnumerable {
+    uint256 private _count;
 
     constructor(string memory name, string memory symbol) ERC721(name, symbol) {
-        _tokenIds.increment();
         _setupRole(
             DEFAULT_ADMIN_ROLE,
-            0xc7f2fBc85f84AD8dc8D11b06167C98763C02D5CA
+            msg.sender
         );
     }
         function _beforeTokenTransfer(address from, address to, uint256 tokenId, uint256 batchSize)
         internal
-        override(ERC721, ERC721Enumerable)
+        override(ERC721)
     {
         super._beforeTokenTransfer(from, to, tokenId, batchSize);
     }
@@ -37,7 +29,7 @@ contract RoleNFT is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable, AccessC
     }
 
     modifier onlyAdmin() {
-        require(this.isAdmin(msg.sender), "Restricted to members.");
+        require(this.isAdmin(msg.sender), "Restricted to admins.");
         _;
     }
 
@@ -51,39 +43,12 @@ contract RoleNFT is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable, AccessC
 
     function mint(
         address to,
-        string memory _tokenURI,
-        string memory _department,
-        string memory _role
+        uint32 _tokenId,
+        string memory _tokenURI
     ) public onlyAdmin {
-        uint256 existTokenID = tokenIdOf[to];
-        if (existTokenID > 0) {
-            _setTokenURI(existTokenID, _tokenURI);
-            idOfIdentity[existTokenID] = Identity(_department, _role);
-            return;
-        }
-        _safeMint(to, _tokenIds.current());
-        _setTokenURI(_tokenIds.current(), _tokenURI);
-        idOfIdentity[_tokenIds.current()] = Identity(_department, _role);
-        tokenIdOf[to] = _tokenIds.current();
-        _tokenIds.increment();
-    }
-
-    function updateIdentity(
-        address _address,
-        string memory _department,
-        string memory _role
-    ) public onlyAdmin {
-        uint256 _tokenId = tokenIdOf[_address];
-        require(_tokenId != 0, "Token id is not exist");
-        idOfIdentity[_tokenId] = Identity(_department, _role);
-    }
-
-    function getIdentity(
-        address _address
-    ) external view returns (Identity memory) {
-        uint256 _tokenId = tokenIdOf[_address];
-        require(_tokenId != 0, "No token for the address");
-        return idOfIdentity[_tokenId];
+        _safeMint(to, _tokenId);
+        _setTokenURI(_tokenId, _tokenURI);
+        _count++;
     }
 
     function tokenURI(
@@ -96,12 +61,10 @@ contract RoleNFT is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable, AccessC
         uint256 tokenId
     ) internal override(ERC721, ERC721URIStorage) {
         super._burn(tokenId);
+        --_count;
     }
 
     function burnToken(uint256 tokenId) external onlyAdmin {
-        address owner = ownerOf(tokenId);
-        delete tokenIdOf[owner];
-        delete idOfIdentity[tokenId];
         _burn(tokenId);
     }
 
@@ -113,7 +76,7 @@ contract RoleNFT is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable, AccessC
     }
 
     function getTotalTokenCount() external view returns (uint256) {
-        return _tokenIds.current() - 1;
+        return _count;
     }
 
     function _transfer(
@@ -128,7 +91,7 @@ contract RoleNFT is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable, AccessC
 
     function supportsInterface(
         bytes4 interfaceId
-    ) public view override(ERC721, ERC721Enumerable, AccessControlEnumerable) returns (bool) {
+    ) public view override(ERC721, AccessControlEnumerable) returns (bool) {
         return super.supportsInterface(interfaceId);
     }
 }

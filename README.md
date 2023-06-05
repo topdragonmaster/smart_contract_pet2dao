@@ -1,6 +1,6 @@
-# Minimal Clone Factory of Vivid1155v2
+# Pet2Dao Contract
 
-Clone Vivid1155v3 contract at low gas fee
+Sequential voting smart contract
 
 ## Deploy
 
@@ -10,6 +10,6 @@ Install and update dependencies
 
 ### Add private key of account to env file
 
-### npx hardhat run scripts/deploy.js --network polygon
+### npx hardhat run scripts/deploy.js --network arbitrum
 
 Deploy smart contract

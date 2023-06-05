@@ -1,7 +1,7 @@
 {
   "_format": "hh-sol-artifact-1",
-  "contractName": "IRoleNFT",
-  "sourceName": "contracts/IRoleNFT.sol",
+  "contractName": "IEmployeeNFT",
+  "sourceName": "contracts/IEmployeeNFT.sol",
   "abi": [
     {
       "anonymous": false,
@@ -138,28 +138,16 @@
       "inputs": [
         {
           "internalType": "address",
-          "name": "_address",
+          "name": "account",
           "type": "address"
         }
       ],
-      "name": "getIdentity",
+      "name": "isAdmin",
       "outputs": [
         {
-          "components": [
-            {
-              "internalType": "string",
-              "name": "department",
-              "type": "string"
-            },
-            {
-              "internalType": "string",
-              "name": "role",
-              "type": "string"
-            }
-          ],
-          "internalType": "struct Identity",
+          "internalType": "bool",
           "name": "",
-          "type": "tuple"
+          "type": "bool"
         }
       ],
       "stateMutability": "view",
