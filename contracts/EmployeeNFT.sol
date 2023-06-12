@@ -51,6 +51,23 @@ contract EmployeeNFT is ERC721, ERC721URIStorage, Ownable, AccessControlEnumerab
         _count++;
     }
 
+    function update(
+        address to,
+        uint32 _tokenId,
+        string memory _tokenURI
+    ) public onlyAdmin {
+        _burn(_tokenId);
+        _safeMint(to, _tokenId);
+        _setTokenURI(_tokenId, _tokenURI);
+    }
+
+    function updateTokenURI(
+        uint32 _tokenId,
+        string memory _tokenURI
+    ) public onlyAdmin {
+        _setTokenURI(_tokenId, _tokenURI);
+    }
+
     function tokenURI(
         uint256 tokenId
     ) public view override(ERC721, ERC721URIStorage) returns (string memory) {

@@ -78,13 +78,20 @@ contract Pet2DAOProposal is Ownable, ERC721URIStorage, EIP712 {
         _proposals.push(Proposal(msg.sender, _contentURI, _approvers, false, _isPublic));
     }
 
-    function approveProposal(uint256 index, LevelVoucher[] calldata vouchers, bool nftRequired) external {
+    function approveProposal(uint256 index, LevelVoucher[] calldata vouchers, bool mintingNFT) external {
         require(
             _proposals[index].isAccepted == false,
             "This proposal is already accepted"
         );
-        Proposal memory _proposal = _proposals[index];
+        Proposal storage _proposal = _proposals[index];
         uint32[] memory _approvers = _proposal.approvers;
+        if (_approvers.length == 1) {
+            if (employeeNFT.ownerOf(uint256(_approvers[0])) != msg.sender) revert("No approver");
+            _proposal.isAccepted = true;
+            _approvedProposalIds.push(index);
+            if (mintingNFT) _mint(index, msg.sender, _proposal.contentURL);
+            return;
+        }
         for(uint256 i = 0; i < _approvers.length - 1; i++) {
             address signer = _verify(vouchers[i]);
             if (signer != employeeNFT.ownerOf(uint256(vouchers[i].nftId)) || vouchers[i].nftId != _approvers[i]) revert("Invalid Voucher Address");
@@ -95,7 +102,7 @@ contract Pet2DAOProposal is Ownable, ERC721URIStorage, EIP712 {
             } else {
                 _proposal.isAccepted = true;
                 _approvedProposalIds.push(index);
-                if (nftRequired) _mint(index, msg.sender, _proposal.contentURL);
+                if (mintingNFT) _mint(index, msg.sender, _proposal.contentURL);
             }
         }
     }

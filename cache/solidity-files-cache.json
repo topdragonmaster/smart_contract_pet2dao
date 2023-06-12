@@ -2,8 +2,8 @@
   "_format": "hh-sol-cache-2",
   "files": {
     "F:\\Dao\\Git\\develop\\smart_contract_pet2dao\\contracts\\EmployeeNFT.sol": {
-      "lastModificationDate": 1685821023082,
-      "contentHash": "95ba0ab5b5c15c99b5ab32fcf65b67e1",
+      "lastModificationDate": 1686015779220,
+      "contentHash": "f3a6ca7d3eeb32dae4e1b65310d5c13b",
       "sourceName": "contracts/EmployeeNFT.sol",
       "solcConfig": {
         "version": "0.8.11",
@@ -25,8 +25,7 @@
                 "ast"
               ]
             }
-          },
-          "libraries": {}
+          }
         }
       },
       "imports": [
@@ -68,8 +67,7 @@
                 "ast"
               ]
             }
-          },
-          "libraries": {}
+          }
         }
       },
       "imports": [
@@ -106,8 +104,7 @@
                 "ast"
               ]
             }
-          },
-          "libraries": {}
+          }
         }
       },
       "imports": [
@@ -146,8 +143,7 @@
                 "ast"
               ]
             }
-          },
-          "libraries": {}
+          }
         }
       },
       "imports": [
@@ -184,8 +180,7 @@
                 "ast"
               ]
             }
-          },
-          "libraries": {}
+          }
         }
       },
       "imports": [
@@ -222,8 +217,7 @@
                 "ast"
               ]
             }
-          },
-          "libraries": {}
+          }
         }
       },
       "imports": [
@@ -266,8 +260,7 @@
                 "ast"
               ]
             }
-          },
-          "libraries": {}
+          }
         }
       },
       "imports": [
@@ -304,8 +297,7 @@
                 "ast"
               ]
             }
-          },
-          "libraries": {}
+          }
         }
       },
       "imports": [],
@@ -340,8 +332,7 @@
                 "ast"
               ]
             }
-          },
-          "libraries": {}
+          }
         }
       },
       "imports": [],
@@ -376,8 +367,7 @@
                 "ast"
               ]
             }
-          },
-          "libraries": {}
+          }
         }
       },
       "imports": [
@@ -414,8 +404,7 @@
                 "ast"
               ]
             }
-          },
-          "libraries": {}
+          }
         }
       },
       "imports": [
@@ -455,8 +444,7 @@
                 "ast"
               ]
             }
-          },
-          "libraries": {}
+          }
         }
       },
       "imports": [],
@@ -491,8 +479,7 @@
                 "ast"
               ]
             }
-          },
-          "libraries": {}
+          }
         }
       },
       "imports": [
@@ -529,8 +516,7 @@
                 "ast"
               ]
             }
-          },
-          "libraries": {}
+          }
         }
       },
       "imports": [],
@@ -565,8 +551,7 @@
                 "ast"
               ]
             }
-          },
-          "libraries": {}
+          }
         }
       },
       "imports": [],
@@ -601,8 +586,7 @@
                 "ast"
               ]
             }
-          },
-          "libraries": {}
+          }
         }
       },
       "imports": [],
@@ -637,8 +621,7 @@
                 "ast"
               ]
             }
-          },
-          "libraries": {}
+          }
         }
       },
       "imports": [],
@@ -673,8 +656,7 @@
                 "ast"
               ]
             }
-          },
-          "libraries": {}
+          }
         }
       },
       "imports": [
@@ -711,8 +693,7 @@
                 "ast"
               ]
             }
-          },
-          "libraries": {}
+          }
         }
       },
       "imports": [
@@ -749,8 +730,7 @@
                 "ast"
               ]
             }
-          },
-          "libraries": {}
+          }
         }
       },
       "imports": [
@@ -764,8 +744,8 @@
       ]
     },
     "F:\\Dao\\Git\\develop\\smart_contract_pet2dao\\contracts\\Proposal.sol": {
-      "lastModificationDate": 1685821977009,
-      "contentHash": "155edf2e0e2a52b74e03b1c29bcb8c97",
+      "lastModificationDate": 1686566156776,
+      "contentHash": "0f229d6378cbeddb624fd4dc19ff16e5",
       "sourceName": "contracts/Proposal.sol",
       "solcConfig": {
         "version": "0.8.11",
@@ -787,8 +767,7 @@
                 "ast"
               ]
             }
-          },
-          "libraries": {}
+          }
         }
       },
       "imports": [
@@ -831,8 +810,7 @@
                 "ast"
               ]
             }
-          },
-          "libraries": {}
+          }
         }
       },
       "imports": [

@@ -28,10 +28,10 @@ const deployRoleNFT = async (name, symbol) => {
   // console.log("EmployeeNFT Contract deployed to:", roleNFT.address);
 
   // await verify(roleNFT.address, [name, symbol]);
-  await verify('0x09a24448fEC175227F2292fbe953b52CbD118041', [name, symbol]);
+  await verify('0x5BA0d1ac15C6E8Db733Fa8c975D4C02c4B7F2958', [name, symbol]);
 
   // return roleNFT.address;
-  return '0x09a24448fEC175227F2292fbe953b52CbD118041'
+  return '0x5BA0d1ac15C6E8Db733Fa8c975D4C02c4B7F2958'
 }
 
 async function main() {
@@ -40,12 +40,12 @@ async function main() {
 
   // Deploy NFT
   const roleNFTHeaderAddr = await deployRoleNFT(
-    "TEST Role NFT",
-    "TEST NFT"
+    "Oncotelic Employee NFT",
+    "Employee NFT"
   );
 
   // Deploy proposal Lock
-  await deployProposal(roleNFTHeaderAddr);
+  // await deployProposal(roleNFTHeaderAddr);
 
   // await verify("0x16153A169E3a7Bfd33cc378EF07cbC016F52d5d1", ["0x9fb29Dfd63227a9aDA03740a4bb2c03824e27184"]);
 }
