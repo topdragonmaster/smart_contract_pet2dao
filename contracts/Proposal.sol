@@ -97,14 +97,11 @@ contract Pet2DAOProposal is Ownable, ERC721URIStorage, EIP712 {
             if (signer != employeeNFT.ownerOf(uint256(vouchers[i].nftId)) || vouchers[i].nftId != _approvers[i]) revert("Invalid Voucher Address");
             if (index != vouchers[i].proposalId) revert("Invalid Proposal Id");
             if (i != vouchers[i].level) revert("Invalid Level");
-            if (i != _approvers.length - 1) {
-                if (!vouchers[i].isAccepted) revert("Proposal is already rejected");
-            } else {
-                _proposal.isAccepted = true;
-                _approvedProposalIds.push(index);
-                if (mintingNFT) _mint(index, msg.sender, _proposal.contentURL);
-            }
+            if (!vouchers[i].isAccepted) revert("Proposal is already rejected");
         }
+        _proposal.isAccepted = true;
+        _approvedProposalIds.push(index);
+        if (mintingNFT) _mint(index, msg.sender, _proposal.contentURL);
     }
 
     function deleteProposal(uint index) public onlyAdmin {
