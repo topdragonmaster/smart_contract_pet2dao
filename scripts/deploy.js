@@ -10,14 +10,14 @@ const info = async () => {
   console.log("Account balance:", (await deployer.getBalance()).toString());
 }
 
-const deployProposal = async (roleNFTAddr) => {
+const deployProposal = async (roleNFTAddr, name, symbol) => {
   
   const Proposal = await hre.ethers.getContractFactory("Pet2DAOProposal");
   const proposal = await Proposal.deploy(roleNFTAddr);
   await proposal.deployed();
   console.log("Proposal Contract deployed to:", proposal.address);
   
-  await verify(proposal.address, [roleNFTAddr]);
+  await verify(proposal.address, [roleNFTAddr, name, symbol]);
 }
 
 const deployRoleNFT = async (name, symbol) => {
@@ -42,7 +42,7 @@ async function main() {
   );
 
   // Deploy proposal Lock
-  await deployProposal(roleNFTHeaderAddr);
+  await deployProposal(roleNFTHeaderAddr, "Approved Proposal NFT", "Proposal NFT");
 }
 
 async function verify(contractAddress, arguments, librayArg){

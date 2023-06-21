@@ -33,8 +33,8 @@ contract Pet2DAOProposal is Ownable, ERC721URIStorage, EIP712 {
     Proposal[] private _proposals;
     uint256[] private _approvedProposalIds;
 
-    constructor(address _employeeNFT)
-        ERC721("Employee NFT", "Employee") EIP712(SIGNING_DOMAIN, SIGNATURE_VERSION) {
+    constructor(address _employeeNFT, string memory name, string memory symbol)
+        ERC721(name, symbol) EIP712(SIGNING_DOMAIN, SIGNATURE_VERSION) {
             employeeNFT = IEmployeeNFT(_employeeNFT);
         }
 
